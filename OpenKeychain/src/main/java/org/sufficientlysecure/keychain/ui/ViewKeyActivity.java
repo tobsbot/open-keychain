@@ -326,6 +326,10 @@ public class ViewKeyActivity extends BaseNfcActivity implements
                 startPassphraseActivity(REQUEST_BACKUP);
                 return true;
             }
+            case R.id.menu_key_view_status: {
+                viewKeyStatus();
+                return true;
+            }
             case R.id.menu_key_view_delete: {
                 deleteKey();
                 return true;
@@ -362,12 +366,19 @@ public class ViewKeyActivity extends BaseNfcActivity implements
         editKey.setVisible(mIsSecret);
         MenuItem exportKey = menu.findItem(R.id.menu_key_view_export_file);
         exportKey.setVisible(mIsSecret);
+        MenuItem viewKeyStatus = menu.findItem(R.id.menu_key_view_status);
+        viewKeyStatus.setVisible(mIsSecret);
         MenuItem certifyFingerprint = menu.findItem(R.id.menu_key_view_certify_fingerprint);
         certifyFingerprint.setVisible(!mIsSecret && !mIsVerified && !mIsExpired && !mIsRevoked);
 
         return true;
     }
 
+    private void viewKeyStatus() {
+        Intent intent = new Intent(this, ViewSecretStatusActivity.class);
+        intent.setData(mDataUri);
+        startActivity(intent);
+    }
 
     private void scanQrCode() {
         Intent scanQrCode = new Intent(this, ImportKeysProxyActivity.class);

@@ -98,6 +98,7 @@
     <string name="menu_help">"Help"</string>
     <string name="menu_export_key">"Backup to file"</string>
     <string name="menu_delete_key">"Delete key"</string>
+    <string name="menu_status">"View key status"</string>
     <string name="menu_manage_keys">"Manage my keys"</string>
     <string name="menu_search">"Search"</string>
     <string name="menu_nfc_preferences">"NFC settings"</string>
@@ -1479,5 +1480,30 @@
     <string name="error_scan_fp">"Error scanning fingerprint!"</string>
     <string name="error_scan_match">"Fingerprints did not match!"</string>
     <string name="error_expiry_past">"Expiry date is in the past!"</string>
+
+    <string name="title_key_status">"Key Status"</string>
+    <string name="cap_title_confirm">Confirm Keys</string>
+    <string name="cap_title_sign">Sign Messages</string>
+    <string name="cap_title_decrypt">Decrypt Messages</string>
+
+    <string name="cap_cert_ok">"This key can confirm other keys."</string>
+    <string name="cap_cert_divert">"This key can confirm other keys, using a YubiKey."</string>
+    <string name="cap_cert_expired">"This key can NOT confirm other keys, because it is expired."</string>
+    <string name="cap_cert_revoked">"This key can NOT confirm other keys, because it is revoked."</string>
+    <string name="cap_cert_unavailable">"This key is stripped, it can NOT confirm other keys."</string>
+    <string name="cap_cert_null">"This key can NOT confirm other keys."</string>
+    <string name="cap_sign_ok">"This key can sign messages."</string>
+    <string name="cap_sign_divert">"This key can sign messages, using a YubiKey."</string>
+    <string name="cap_sign_expired">"This key can NOT sign messages, because it is expired."</string>
+    <string name="cap_sign_revoked">"This key can NOT sign messages, because it is revoked."</string>
+    <string name="cap_sign_unavailable">"This key is stripped, it can NOT sign messages."</string>
+    <string name="cap_sign_null">"This key can NOT sign messages."</string>
+    <string name="cap_decrypt_ok">"This key can decrypt messages."</string>
+    <string name="cap_decrypt_divert">"This key can decrypt messages, using a YubiKey."</string>
+    <string name="cap_decrypt_expired">"This key can decrypt messages, but is expired."</string>
+    <string name="cap_decrypt_revoked">"This key can decrypt messages, but is revoked."</string>
+    <string name="cap_decrypt_unavailable">"This key is stripped, it can NOT decrypt messages."</string>
+    <string name="cap_decrypt_null">"This key can NOT decrypt messages."</string>
+    <string name="caption_secret_status">This key is yours, and can be used for the following things:</string>
 
 </resources>

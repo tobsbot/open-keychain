@@ -114,6 +114,9 @@
             android:name=".ui.QrCodeViewActivity"
             android:label="@string/share_qr_code_dialog_title" />
         <activity
+            android:name=".ui.ViewSecretStatusActivity"
+            android:label="@string/title_key_status" />
+        <activity
             android:name=".ui.ViewKeyActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|keyboard"
             android:label="@string/title_key_details"

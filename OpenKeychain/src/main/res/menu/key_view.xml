@@ -27,6 +27,11 @@
         android:title="@string/menu_delete_key" />
 
     <item
+        android:id="@+id/menu_key_view_status"
+        app:showAsAction="never"
+        android:title="@string/menu_status" />
+
+    <item
         android:id="@+id/menu_key_view_advanced"
         app:showAsAction="never"
         android:title="@string/menu_advanced" />
