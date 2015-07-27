@@ -18,6 +18,10 @@
 
 package org.sufficientlysecure.keychain.ui;
 
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -52,7 +56,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-
 import org.sufficientlysecure.keychain.Constants;
 import org.sufficientlysecure.keychain.R;
 import org.sufficientlysecure.keychain.keyimport.ParcelableKeyRing;
@@ -79,9 +82,6 @@ import org.sufficientlysecure.keychain.util.ExportHelper;
 import org.sufficientlysecure.keychain.util.Log;
 import org.sufficientlysecure.keychain.util.NfcHelper;
 import org.sufficientlysecure.keychain.util.Preferences;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class ViewKeyActivity extends BaseNfcActivity implements
         LoaderManager.LoaderCallbacks<Cursor>,
@@ -287,13 +287,6 @@ public class ViewKeyActivity extends BaseNfcActivity implements
             return;
         }
 
-        FragmentManager manager = getSupportFragmentManager();
-        // Create an instance of the fragment
-        final ViewKeyFragment frag = ViewKeyFragment.newInstance(mDataUri);
-        manager.beginTransaction()
-                .replace(R.id.view_key_fragment, frag)
-                .commit();
-
         // need to postpone loading of the yubikey fragment until after mMasterKeyId
         // is available, but we mark here that this should be done
         mShowYubikeyAfterCreation = true;
@@ -395,7 +388,7 @@ public class ViewKeyActivity extends BaseNfcActivity implements
 
     private void certifyImmediate() {
         Intent intent = new Intent(this, CertifyKeyActivity.class);
-        intent.putExtra(CertifyKeyActivity.EXTRA_KEY_IDS, new long[]{mMasterKeyId});
+        intent.putExtra(CertifyKeyActivity.EXTRA_KEY_IDS, new long[] { mMasterKeyId });
 
         startActivityForResult(intent, REQUEST_CERTIFY);
     }
@@ -582,6 +575,31 @@ public class ViewKeyActivity extends BaseNfcActivity implements
 
     }
 
+    public void showMainFragment() {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                FragmentManager manager = getSupportFragmentManager();
+
+                // unless we must refresh
+                ViewKeyFragment frag = (ViewKeyFragment) manager.findFragmentByTag("view_key_fragment");
+                // if everything is valid, just drop it
+                if (frag != null && frag.isValidForData(mIsSecret)) {
+                    return;
+                }
+
+                // if the main fragment doesn't exist, or is not of the correct type, (re)create it
+                frag = ViewKeyFragment.newInstance(mMasterKeyId, mIsSecret);
+                // get rid of possible backstack, this fragment is always at the bottom
+                manager.popBackStack("yubikey", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                manager.beginTransaction()
+                        .replace(R.id.view_key_fragment, frag, "view_key_fragment")
+                        // if this gets lost, it doesn't really matter since the loader will reinstate it onResume
+                        .commitAllowingStateLoss();
+            }
+        });
+    }
+
     private void encrypt(Uri dataUri, boolean text) {
         // If there is no encryption key, don't bother.
         if (!mHasEncrypt) {
@@ -736,18 +754,15 @@ public class ViewKeyActivity extends BaseNfcActivity implements
             case LOADER_ID_UNIFIED: {
 
                 if (data.moveToFirst()) {
-                    // get name, email, and comment from USER_ID
-                    KeyRing.UserId mainUserId = KeyRing.splitUserId(data.getString(INDEX_USER_ID));
-                    if (mainUserId.name != null) {
-                        mName.setText(mainUserId.name);
-                    } else {
-                        mName.setText(R.string.user_id_no_name);
-                    }
 
                     mMasterKeyId = data.getLong(INDEX_MASTER_KEY_ID);
+                    mIsSecret = data.getInt(INDEX_HAS_ANY_SECRET) != 0;
                     mFingerprint = KeyFormattingUtils.convertFingerprintToHex(data.getBlob(INDEX_FINGERPRINT));
 
-                    // if it wasn't shown yet, display yubikey fragment
+                    // queue showing of the main fragment
+                    showMainFragment();
+
+                    // if it wasn't shown yet (but is supposed to be), display yubikey fragment
                     if (mShowYubikeyAfterCreation && getIntent().hasExtra(EXTRA_NFC_AID)) {
                         mShowYubikeyAfterCreation = false;
                         Intent intent = getIntent();
@@ -757,11 +772,17 @@ public class ViewKeyActivity extends BaseNfcActivity implements
                         showYubiKeyFragment(nfcFingerprints, nfcUserId, nfcAid);
                     }
 
-                    mIsSecret = data.getInt(INDEX_HAS_ANY_SECRET) != 0;
                     mHasEncrypt = data.getInt(INDEX_HAS_ENCRYPT) != 0;
                     mIsRevoked = data.getInt(INDEX_IS_REVOKED) > 0;
                     mIsExpired = data.getInt(INDEX_IS_EXPIRED) != 0;
                     mIsVerified = data.getInt(INDEX_VERIFIED) > 0;
+
+                    KeyRing.UserId mainUserId = KeyRing.splitUserId(data.getString(INDEX_USER_ID));
+                    if (mainUserId.name != null) {
+                        mName.setText(mainUserId.name);
+                    } else {
+                        mName.setText(R.string.user_id_no_name);
+                    }
 
                     // if the refresh animation isn't playing
                     if (!mRotate.hasStarted() && !mRotateSpin.hasStarted()) {
