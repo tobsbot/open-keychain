@@ -62,8 +62,12 @@ public class ViewKeyFragment extends LoaderFragment implements
     ImageView mSystemContactPicture;
     TextView mSystemContactName;
 
+    CardView mSubkeyStatusCard;
+    SubkeyStatusList mSubkeyStatusList;
+
     private static final int LOADER_ID_USER_IDS = 1;
     private static final int LOADER_ID_LINKED_CONTACT = 2;
+    private static final int LOADER_ID_SUBKEY_STATUS = 3;
 
     private UserIdsAdapter mUserIdsAdapter;
 
@@ -103,6 +107,9 @@ public class ViewKeyFragment extends LoaderFragment implements
         mSystemContactName = (TextView) view.findViewById(R.id.system_contact_name);
         mSystemContactPicture = (ImageView) view.findViewById(R.id.system_contact_picture);
 
+        mSubkeyStatusCard = (CardView) view.findViewById(R.id.subkey_status_card);
+        mSubkeyStatusList = (SubkeyStatusList) view.findViewById(R.id.subkey_status_list);
+
         return root;
     }
 
@@ -127,6 +134,11 @@ public class ViewKeyFragment extends LoaderFragment implements
         // initialize loaders, which will take care of auto-refresh on change
         getLoaderManager().initLoader(LOADER_ID_USER_IDS, null, this);
         getLoaderManager().initLoader(LOADER_ID_LINKED_CONTACT, null, this);
+        if (mIsSecret) {
+            Bundle args = new Bundle();
+            args.putLong(SubkeyStatusList.ARG_MASTER_KEY_ID, mMasterKeyId);
+            getLoaderManager().initLoader(LOADER_ID_SUBKEY_STATUS, args, this);
+        }
 
     }
 
@@ -253,6 +265,10 @@ public class ViewKeyFragment extends LoaderFragment implements
                         null);
             }
 
+            case LOADER_ID_SUBKEY_STATUS: {
+                return mSubkeyStatusList.onCreateLoader(id, args);
+            }
+
             default:
                 return null;
         }
@@ -284,6 +300,12 @@ public class ViewKeyFragment extends LoaderFragment implements
                 break;
             }
 
+            case LOADER_ID_SUBKEY_STATUS: {
+                mSubkeyStatusList.onLoadFinished(loader, data);
+                mSubkeyStatusCard.setVisibility(View.VISIBLE);
+                break;
+            }
+
         }
         setContentShown(true);
     }
@@ -299,6 +321,9 @@ public class ViewKeyFragment extends LoaderFragment implements
                 mUserIdsAdapter.swapCursor(null);
                 break;
             }
+            case LOADER_ID_SUBKEY_STATUS:
+                mSubkeyStatusList.onLoaderReset(loader);
+                break;
         }
     }
 

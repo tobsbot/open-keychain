@@ -45,8 +45,8 @@ public class ViewSecretStatusActivity extends BaseActivity {
 
         try {
             long masterKeyId = new ProviderHelper(this).getCachedPublicKeyRing(data).extractOrGetMasterKeyId();
-            Fragment frag = ViewSecretStatusFragment.newInstance(masterKeyId);
-            getSupportFragmentManager().beginTransaction().replace(R.id.view_secret_status_frag, frag).commit();
+            // Fragment frag = SubkeyStatusCard.newInstance(masterKeyId);
+            // getSupportFragmentManager().beginTransaction().replace(R.id.view_secret_status_frag, frag).commit();
         } catch (PgpKeyNotFoundException e) {
             Log.e(Constants.TAG, "key not found!", e);
             finish();

@@ -20,20 +20,21 @@ package org.sufficientlysecure.keychain.ui;
 
 import java.util.Date;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.sufficientlysecure.keychain.R;
@@ -41,9 +42,7 @@ import org.sufficientlysecure.keychain.pgp.CanonicalizedSecretKey.SecretKeyType;
 import org.sufficientlysecure.keychain.provider.KeychainContract.Keys;
 
 
-public class ViewSecretStatusFragment extends Fragment implements LoaderCallbacks<Cursor> {
-
-    public static final String EXTRA_MASTER_KEY_ID = "master_key_id";
+public class SubkeyStatusList extends LinearLayout implements LoaderCallbacks<Cursor> {
 
     public static final String[] PROJECTION = new String[] {
             Keys.KEY_ID,
@@ -64,31 +63,18 @@ public class ViewSecretStatusFragment extends Fragment implements LoaderCallback
     public static final int INDEX_EXPIRY = 6;
     public static final int INDEX_IS_REVOKED = 7;
 
-    long mMasterKeyId;
+    public static final String ARG_MASTER_KEY_ID = "master_key_id";
 
     TextView vCertText, vSignText, vDecryptText;
     ImageView vCertIcon, vSignIcon, vDecryptIcon;
     View vCertYubi, vSignYubi, vDecryptYubi;
 
-    public static ViewSecretStatusFragment newInstance(long masterKeyId) {
-        ViewSecretStatusFragment frag = new ViewSecretStatusFragment();
+    public SubkeyStatusList(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-        Bundle args = new Bundle();
-        args.putLong(EXTRA_MASTER_KEY_ID, masterKeyId);
-        frag.setArguments(args);
+        setOrientation(VERTICAL);
 
-        return frag;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mMasterKeyId = getArguments().getLong(EXTRA_MASTER_KEY_ID);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.view_secret_status_fragment, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.subkey_status_card_content, this, true);
 
         vCertText = (TextView) view.findViewById(R.id.cap_cert_text);
         vSignText = (TextView) view.findViewById(R.id.cap_sign_text);
@@ -102,18 +88,13 @@ public class ViewSecretStatusFragment extends Fragment implements LoaderCallback
         vSignYubi = view.findViewById(R.id.cap_sign_yubi);
         vDecryptYubi = view.findViewById(R.id.cap_decrypt_yubi);
 
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), Keys.buildKeysUri(mMasterKeyId), PROJECTION, null, null, null);
+        long masterKeyId = args.getLong(ARG_MASTER_KEY_ID);
+        return new CursorLoader(getContext(),
+                Keys.buildKeysUri(masterKeyId), PROJECTION, null, null, null);
     }
 
     // this is just a list of statuses a key can be in, which we can also display
