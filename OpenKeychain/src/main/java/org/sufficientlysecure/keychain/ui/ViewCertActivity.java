@@ -163,7 +163,12 @@ public class ViewCertActivity extends BaseActivity
                     mType.setText(R.string.cert_revoke);
                     if (sig.isRevocation()) {
                         try {
-                            mReason.setText(sig.getRevocationReason());
+                            String reason = sig.getRevocationReason();
+                            if (reason != null) {
+                                mReason.setText(reason);
+                            } else {
+                                mReason.setText(R.string.none);
+                            }
                         } catch(PgpGeneralException e) {
                             mReason.setText(R.string.none);
                         }
