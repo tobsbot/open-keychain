@@ -181,7 +181,7 @@ public class SubkeyStatusList extends LinearLayout implements LoaderCallbacks<Cu
     }
 
     @Nullable
-    private SubKeyItem findBestKeyOfType(Cursor cursor, int type) {
+    private static SubKeyItem findBestKeyOfType(Cursor cursor, int type) {
         if (!cursor.moveToFirst()) {
             return null;
         }
@@ -263,12 +263,8 @@ public class SubkeyStatusList extends LinearLayout implements LoaderCallbacks<Cu
             if (isValid() ^ another.isValid()) {
                 return isValid() ? -1 : 1;
             }
-            // if the secret key types are different, the "stronger one" one wins
-            if (mSecretKeyType != another.mSecretKeyType) {
-                return 1;
-            }
             // compare usability, if one is "more usable" than the other, that one comes first
-            int usability = mSecretKeyType.compareCapabilities(another.mSecretKeyType);
+            int usability = mSecretKeyType.compareUsability(another.mSecretKeyType);
             if (usability != 0) {
                 return usability;
             }

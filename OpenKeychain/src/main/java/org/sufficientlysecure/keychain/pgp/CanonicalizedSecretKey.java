@@ -118,7 +118,10 @@ public class CanonicalizedSecretKey extends CanonicalizedPublicKey {
         }
 
         /** Compares by "usability", which basically compares how independently usable
-         * two SecretKeyTypes are.
+         * two SecretKeyTypes are. The order is roughly this:
+         *
+         * empty passphrase < passphrase/others < divert < stripped
+         *
          */
         public int compareUsability(SecretKeyType other) {
             // if one is usable but the other isn't, the usable one comes first
