@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sufficientlysecure.keychain.ui;
+package org.sufficientlysecure.keychain.ui.widget;
 
 
 import java.util.Date;
@@ -268,7 +268,7 @@ public class SubkeyStatusList extends LinearLayout implements LoaderCallbacks<Cu
                 return 1;
             }
             // compare usability, if one is "more usable" than the other, that one comes first
-            int usability = mSecretKeyType.compareUsability(another.mSecretKeyType);
+            int usability = mSecretKeyType.compareCapabilities(another.mSecretKeyType);
             if (usability != 0) {
                 return usability;
             }
