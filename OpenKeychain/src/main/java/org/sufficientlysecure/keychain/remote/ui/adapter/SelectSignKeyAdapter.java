@@ -73,7 +73,7 @@ public class SelectSignKeyAdapter extends KeyCursorAdapter<CursorAdapter.KeyCurs
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if(holder.getItemViewType() == VIEW_TYPE_KEY) {
-            super.onBindViewHolder(holder, position);;
+            super.onBindViewHolder(holder, position);
         }
     }
 
